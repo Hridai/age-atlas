@@ -13,7 +13,7 @@ historical_data = {
     },
     "70,000 BC - 12,000 BC": {
         "World": "Beginning of history, sapiens move out of Africa",
-        "AUS": "Sapiens settle Australia. Extinction of Megafauna",
+        "AUS": "45,000 BC: Sapiens settle Australia. Extinction of Megafauna",
     },
     "1900-01-01": {
         "USA": "First electric bus line began operation in New York",

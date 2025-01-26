@@ -62,48 +62,69 @@ function createTimeline() {
 }
 
 function selectDate(date, element, data) {
-   document.querySelectorAll('.timeline-date').forEach(el => {
-       el.classList.remove('selected');
-   });
-   
-   Object.values(countryLayers).forEach(layer => {
-       layer.setStyle({
-           color: '#d3d3d3',
-           fillColor: '#d3d3d3',
-           fillOpacity: 0.4
-       });
-   });
-   
-   element.classList.add('selected');
-   selectedDate = date;
+    document.querySelectorAll('.timeline-date').forEach(el => {
+        el.classList.remove('selected');
+    });
+    
+    Object.values(countryLayers).forEach(layer => {
+        layer.setStyle({
+            color: '#d3d3d3',
+            fillColor: '#d3d3d3',
+            fillOpacity: 0.4
+        });
+    });
+    
+    element.classList.add('selected');
+    selectedDate = date;
+ 
+    const events = data[date];
+    const countries = Object.keys(events).filter(key => key !== 'order');
+    
+    Object.keys(events).forEach(country => {
+        if (countryLayers[country]) {
+            countryLayers[country].setStyle({
+                color: '#007bff',
+                fillColor: '#007bff',
+                fillOpacity: 0.7
+            });
+        }
+    });
+ 
+    const infoPanel = document.getElementById('info-panel');
+    // Single entry case - keep in top right
+    if (countries.length === 1) {
+        infoPanel.textContent = events[countries[0]];
+        infoPanel.style.position = 'absolute';
+        infoPanel.style.top = '20px';
+        infoPanel.style.right = '20px';
+        infoPanel.style.display = 'block';
+        // Remove mousemove event
+        document.onmousemove = null;
+    } else {
+        infoPanel.style.display = 'none';
+    }
+ }
 
-   const events = data[date];
-   Object.keys(events).forEach(country => {
-       if (countryLayers[country]) {
-           countryLayers[country].setStyle({
-               color: '#007bff',
-               fillColor: '#007bff',
-               fillOpacity: 0.7
-           });
-       }
-   });
-
-   document.getElementById('info-panel').style.display = 'none';
-}
-
-function showCountryInfo(country) {
-   if (selectedDate) {
-       fetch('/api/events')
-           .then(response => response.json())
-           .then(data => {
-               if (data[selectedDate][country]) {
-                   const infoPanel = document.getElementById('info-panel');
-                   infoPanel.textContent = data[selectedDate][country];
-                   infoPanel.style.display = 'block';
-               }
-           });
-   }
-}
+ function showCountryInfo(country) {
+    if (selectedDate) {
+        fetch('/api/events')
+            .then(response => response.json())
+            .then(data => {
+                if (data[selectedDate][country]) {
+                    const infoPanel = document.getElementById('info-panel');
+                    infoPanel.textContent = data[selectedDate][country];
+                    
+                    document.onmousemove = function(e) {
+                        infoPanel.style.left = `${e.clientX}px`;
+                        infoPanel.style.top = `${e.clientY}px`;
+                        infoPanel.style.position = 'fixed';
+                    };
+                    
+                    infoPanel.style.display = 'block';
+                }
+            });
+    }
+ }
 
 document.addEventListener('DOMContentLoaded', () => {
    initMap();
