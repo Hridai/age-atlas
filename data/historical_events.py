@@ -14,13 +14,10 @@ historical_data = {
     "70,000 BC - 12,000 BC": {
         "World": "Beginning of history, sapiens move out of Africa",
         "AUS": "45,000 BC: Sapiens settle Australia. Extinction of Megafauna",
+        "Mesopotamia": "70,000 BC: Sapiens settle Mesopotamia, modern day Iraq, between the Euphrates and Tigris rivers. Boats, bows, arrows and needles for sewing clothing invented until 30,000 BC",
+        "CHN": "60,000 BC: Sapiens settle East and Central Asia",
+        "FRA": "45,000 BC: Sapiens settle Europe",
+        "USA": "16,000 BC: Sapiens settle North America via landbridge between Russia and Alaska, available due to low sea levels. Exctinction of American megafauna",
+        "MEX": "14,000BC: Sapiens migrate further south due to global warming melting ice and clearing a passage into Central America, reaching Argentina by 10,000 BC"
     },
-    "1900-01-01": {
-        "USA": "First electric bus line began operation in New York",
-        "IND": "Lord Curzon organized the great Delhi Durbar"
-    },
-    "1901-01-01": {
-        "USA": "President William McKinley began his second term",
-        "FRA": "First Paris Metro line opened"
-    }
 }
