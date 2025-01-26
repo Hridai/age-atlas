@@ -16,6 +16,16 @@ body {
     z-index: 1000;
 }
 
+#logo {
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+#logo img {
+    max-width: 150px;
+    height: auto;
+}
+
 #map-container {
     flex-grow: 1;
     position: relative;

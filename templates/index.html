@@ -9,7 +9,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 </head>
 <body>
-    <div id="timeline"></div>
+    <div id="timeline">
+        <div id="logo">
+            <img src="{{ url_for('static', filename='images/small-logo.jpg') }}" alt="Logo">
+        </div>
+    </div>
     <div id="map-container">
         <div id="map"></div>
         <div id="info-panel"></div>
