@@ -9,7 +9,11 @@ def index():
 
 @app.route('/api/events')
 def get_events():
-    return jsonify(historical_data)
+    ordered_data = {
+        date: {'order': idx, **events} 
+        for idx, (date, events) in enumerate(historical_data.items())
+    }
+    return jsonify(ordered_data)
 
 if __name__ == '__main__':
     app.run(debug=True)

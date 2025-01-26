@@ -45,18 +45,20 @@ function initMap() {
 }
 
 function createTimeline() {
-   const timeline = document.getElementById('timeline');
-   fetch('/api/events')
-       .then(response => response.json())
-       .then(data => {
-           Object.keys(data).sort().forEach(date => {
-               const dateDiv = document.createElement('div');
-               dateDiv.className = 'timeline-date';
-               dateDiv.textContent = date;
-               dateDiv.onclick = () => selectDate(date, dateDiv, data);
-               timeline.appendChild(dateDiv);
-           });
-       });
+    const timeline = document.getElementById('timeline');
+    fetch('/api/events')
+        .then(response => response.json())
+        .then(data => {
+            Object.entries(data)
+                .sort((a, b) => a[1].order - b[1].order)
+                .forEach(([date, events]) => {
+                    const dateDiv = document.createElement('div');
+                    dateDiv.className = 'timeline-date';
+                    dateDiv.textContent = date;
+                    dateDiv.onclick = () => selectDate(date, dateDiv, data);
+                    timeline.appendChild(dateDiv);
+                });
+        });
 }
 
 function selectDate(date, element, data) {
