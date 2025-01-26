@@ -28,22 +28,23 @@ function initMap() {
    };
 
    Object.entries(countries).forEach(([countryCode, coordinates]) => {
-       const polygon = L.polygon(coordinates, {
-           color: '#d3d3d3',
-           fillColor: '#d3d3d3',
-           fillOpacity: 0.4,
-           weight: 1,
-           className: 'country-polygon'
-       }).addTo(map);
+        const polygon = L.polygon(coordinates, {
+            color: 'transparent',
+            fillColor: 'transparent',
+            fillOpacity: 0,
+            opacity: 0,
+            weight: 1,
+            className: 'country-polygon'
+        }).addTo(map);
 
-       polygon.on({
-           mouseover: () => showCountryInfo(countryCode),
-           mouseout: () => {
-               document.getElementById('info-panel').style.display = 'none';
-           }
-       });
-       countryLayers[countryCode] = polygon;
-   });
+        polygon.on({
+            mouseover: () => showCountryInfo(countryCode),
+            mouseout: () => {
+                document.getElementById('info-panel').style.display = 'none';
+            }
+        });
+        countryLayers[countryCode] = polygon;
+    });
 }
 
 function createTimeline() {
@@ -68,39 +69,41 @@ function selectDate(date, element, data) {
         el.classList.remove('selected');
     });
     
+    // First hide all countries completely
     Object.values(countryLayers).forEach(layer => {
         layer.setStyle({
-            color: '#d3d3d3',
-            fillColor: '#d3d3d3',
-            fillOpacity: 0.4
+            opacity: 0,
+            fillOpacity: 0,
+            fillColor: 'transparent',
+            color: 'transparent'
         });
     });
     
     element.classList.add('selected');
     selectedDate = date;
  
+    // Show only countries with events
     const events = data[date];
     const countries = Object.keys(events).filter(key => key !== 'order');
     
     Object.keys(events).forEach(country => {
-        if (countryLayers[country]) {
+        if (countryLayers[country] && country !== 'order') {
             countryLayers[country].setStyle({
                 color: '#007bff',
                 fillColor: '#007bff',
-                fillOpacity: 0.7
+                fillOpacity: 0.7,
+                opacity: 1
             });
         }
     });
  
     const infoPanel = document.getElementById('info-panel');
-    // Single entry case - keep in top right
     if (countries.length === 1) {
         infoPanel.textContent = events[countries[0]];
         infoPanel.style.position = 'absolute';
         infoPanel.style.top = '20px';
         infoPanel.style.right = '20px';
         infoPanel.style.display = 'block';
-        // Remove mousemove event
         document.onmousemove = null;
     } else {
         infoPanel.style.display = 'none';
