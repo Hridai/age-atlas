@@ -2,6 +2,68 @@
 let map;
 let selectedDate = null;
 let countryLayers = {};
+let selectedTopics = new Set();
+
+function initSettings() {
+    const settingsButton = document.getElementById('settings-button');
+    const modal = document.getElementById('settings-modal');
+    const closeButton = document.getElementById('close-modal');
+    const topicCheckboxes = document.getElementById('topic-checkboxes');
+
+    // Get unique topics from historical data
+    fetch('/api/events')
+        .then(response => response.json())
+        .then(data => {
+            const topics = new Set();
+            Object.values(data).forEach(dateEvents => {
+                Object.values(dateEvents).forEach(countryEvents => {
+                    if (typeof countryEvents === 'object' && countryEvents !== null) {
+                        Object.keys(countryEvents).forEach(topic => topics.add(topic));
+                    }
+                });
+            });
+
+            // Create checkboxes for each topic
+            topics.forEach(topic => {
+                const div = document.createElement('div');
+                div.className = 'topic-checkbox';
+                
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = topic;
+                checkbox.checked = true; // Default all to checked
+                selectedTopics.add(topic); // Add to selected topics
+                
+                const label = document.createElement('label');
+                label.htmlFor = topic;
+                label.textContent = topic;
+
+                checkbox.addEventListener('change', (e) => {
+                    if (e.target.checked) {
+                        selectedTopics.add(topic);
+                    } else {
+                        selectedTopics.delete(topic);
+                    }
+                    if (selectedDate) {
+                        const dateDiv = document.querySelector('.timeline-date.selected');
+                        selectDate(selectedDate, dateDiv, data);
+                    }
+                });
+
+                div.appendChild(checkbox);
+                div.appendChild(label);
+                topicCheckboxes.appendChild(div);
+            });
+        });
+
+    settingsButton.onclick = () => modal.style.display = "block";
+    closeButton.onclick = () => modal.style.display = "none";
+    window.onclick = (event) => {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+}
 
 function initMap() {
    map = L.map('map').setView([20, 0], 2);
@@ -93,16 +155,20 @@ function selectDate(date, element, data) {
 
     // Show only countries with events
     const events = data[date];
-    const countries = Object.keys(events).filter(key => key !== 'order');
-    
-    Object.keys(events).forEach(country => {
+    Object.entries(events).forEach(([country, countryEvents]) => {
         if (countryLayers[country] && country !== 'order') {
-            countryLayers[country].setStyle({
-                color: '#007bff',
-                fillColor: '#007bff',
-                fillOpacity: 0.7,
-                opacity: 1
-            });
+            // Check if country has any events in selected topics
+            const hasSelectedTopics = Object.keys(countryEvents)
+                .some(topic => selectedTopics.has(topic));
+            
+            if (hasSelectedTopics) {
+                countryLayers[country].setStyle({
+                    color: '#007bff',
+                    fillColor: '#007bff',
+                    fillOpacity: 0.7,
+                    opacity: 1
+                });
+            }
         }
     });
 
@@ -125,29 +191,32 @@ function selectDate(date, element, data) {
     }
 }
 
- function showCountryInfo(country) {
+function showCountryInfo(country) {
     if (selectedDate) {
         fetch('/api/events')
             .then(response => response.json())
             .then(data => {
                 if (data[selectedDate][country]) {
-                    const infoPanel = document.getElementById('info-panel');
                     const countryEvents = data[selectedDate][country];
-                    
-                    // Combine all themes with line breaks
-                    const combinedText = Object.entries(countryEvents)
-                        .map(([theme, text]) => `${theme}:\n${text}`)
-                        .join('\n\n');
-                    
-                    infoPanel.textContent = combinedText;
-                    
-                    document.onmousemove = function(e) {
-                        infoPanel.style.left = `${e.clientX}px`;
-                        infoPanel.style.top = `${e.clientY}px`;
-                        infoPanel.style.position = 'fixed';
-                    };
-                    
-                    infoPanel.style.display = 'block';
+                    const filteredEvents = Object.entries(countryEvents)
+                        .filter(([theme]) => selectedTopics.has(theme));
+
+                    if (filteredEvents.length > 0) {
+                        const infoPanel = document.getElementById('info-panel');
+                        const combinedText = filteredEvents
+                            .map(([theme, text]) => `${theme}:\n${text}`)
+                            .join('\n\n');
+                        
+                        infoPanel.textContent = combinedText;
+                        
+                        document.onmousemove = function(e) {
+                            infoPanel.style.left = `${e.clientX}px`;
+                            infoPanel.style.top = `${e.clientY}px`;
+                            infoPanel.style.position = 'fixed';
+                        };
+                        
+                        infoPanel.style.display = 'block';
+                    }
                 }
             });
     }
@@ -157,4 +226,5 @@ function selectDate(date, element, data) {
 document.addEventListener('DOMContentLoaded', () => {
    initMap();
    createTimeline();
+   initSettings();
 });
