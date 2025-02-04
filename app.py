@@ -10,7 +10,7 @@ import pandas as pd
 app = Flask(__name__)
 
 def load_historical_data():
-    df = pd.read_csv('data/historical_events.csv')
+    df = pd.read_csv('data/historical_events.csv', sep='|')
     
     # Convert DataFrame to the required dictionary structure
     historical_data = {}

@@ -13,12 +13,19 @@
         <div id="logo">
             <img src="{{ url_for('static', filename='images/small-logo.jpg') }}" alt="Logo">
         </div>
-        <button id="settings-button" class="settings-btn">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-            </svg>
-        </button>
+        <div class="button-container"></div>
+            <button id="settings-button" class="settings-btn" title="Settings">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                </svg>
+            </button>
+            <button id="submit-fact-button" class="settings-btn" title="Submit a fact">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                </svg>
+            </button>
+        </div>
     
         <!-- Modal -->
         <div id="settings-modal" class="modal">
@@ -37,5 +44,57 @@
         <div id="info-panel"></div>
     </div>
     <script src="{{ url_for('static', filename='js/map.js') }}"></script>
+
+    <!-- Add this modal HTML -->
+    <div id="submit-fact-modal" class="modal">
+        <div class="modal-content">
+            <h3>Submit a Historical Fact</h3>
+            <form id="fact-submission-form">
+                <div class="form-group">
+                    <label for="country">Country*</label>
+                    <input type="text" id="country" required placeholder="Enter country name">
+                </div>
+                
+                <div class="form-group">
+                    <label for="time-period">Time Period*</label>
+                    <input type="text" id="time-period" required placeholder="e.g., 1900-01-01 or 500 BC">
+                </div>
+    
+                <div class="form-group">
+                    <label for="theme">Theme*</label>
+                    <select id="theme" required>
+                        <option value="">Select a theme</option>
+                        <!-- Will be populated from existing themes -->
+                    </select>
+                </div>
+    
+                <div class="form-group">
+                    <label for="source">Source*</label>
+                    <input type="text" id="source" required placeholder="Source of the historical fact">
+                </div>
+    
+                <div class="form-group">
+                    <label for="email">Your Email*</label>
+                    <input type="email" id="email" required placeholder="Your email address">
+                </div>
+    
+                <div class="form-group">
+                    <label for="fact">Historical Fact*</label>
+                    <textarea id="fact" required placeholder="Enter the historical fact" rows="4"></textarea>
+                </div>
+    
+                <div class="button-group">
+                    <button type="button" id="cancel-submission" class="secondary-btn">Cancel</button>
+                    <button type="submit" id="send-fact" class="primary-btn">Send</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div id="toast" class="toast">
+        <span class="toast-icon">✓</span>
+        <span class="toast-message">Fact submitted successfully!</span>
+    </div>
 </body>
 </html>

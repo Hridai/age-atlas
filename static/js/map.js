@@ -228,10 +228,70 @@ function showCountryInfo(country) {
     }
 }
 
+function initSubmitFact() {
+    const submitButton = document.getElementById('submit-fact-button');
+    const modal = document.getElementById('submit-fact-modal');
+    const form = document.getElementById('fact-submission-form');
+    const cancelButton = document.getElementById('cancel-submission');
+    const toast = document.getElementById('toast');
+
+    // Populate theme dropdown from historical data
+    fetch('/api/events')
+        .then(response => response.json())
+        .then(data => {
+            const themes = new Set();
+            
+            Object.values(data).forEach(dateEvents => {
+                Object.values(dateEvents).forEach(countryEvents => {
+                    if (typeof countryEvents === 'object' && countryEvents !== null) {
+                        Object.keys(countryEvents).forEach(theme => {
+                            if (theme !== 'order') {
+                                themes.add(theme);
+                            }
+                        });
+                    }
+                });
+            });
+            
+            const themeSelect = document.getElementById('theme');
+            themes.forEach(theme => {
+                const option = document.createElement('option');
+                option.value = theme;
+                option.textContent = theme;
+                themeSelect.appendChild(option);
+            });
+        });
+
+    submitButton.onclick = () => modal.style.display = "block";
+    cancelButton.onclick = () => modal.style.display = "none";
+
+    // Simplified form submission just showing toast
+    form.onsubmit = (e) => {
+        e.preventDefault();
+        
+        // Show toast
+        toast.style.display = 'flex';
+        setTimeout(() => {
+            toast.style.display = 'none';
+        }, 3000);
+
+        // Close modal and reset form
+        modal.style.display = 'none';
+        form.reset();
+    };
+
+    // Close modal on outside click
+    window.onclick = (event) => {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    };
+}
 
 
 document.addEventListener('DOMContentLoaded', () => {
    initMap();
    createTimeline();
    initSettings();
+   initSubmitFact();
 });
