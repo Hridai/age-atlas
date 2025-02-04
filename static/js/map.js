@@ -1,7 +1,8 @@
 // static/js/map.js
 let map;
-let selectedDate = null;
 let countryLayers = {};
+let countryNames = {};  // Add this at the top with your other global variables
+let selectedDate = null;
 let selectedTopics = new Set();
 
 function initSettings() {
@@ -72,17 +73,15 @@ function initMap() {
         attribution: '&copy; OpenStreetMap contributors'
     }).addTo(map);
 
-    // Fetch countries data from CSV
     fetch('/data/country_coordinates.csv')
         .then(response => response.text())
         .then(csvText => {
             const countries = {};
-            // Skip header row and split into lines
             const lines = csvText.trim().split('\n').slice(1);
             
             lines.forEach(line => {
                 if (line) {
-                    const [countryCode, coordsStr] = line.split('|');
+                    const [countryCode, countryName, coordsStr] = line.split('|');
                     const coordinates = coordsStr.split(';').map(pair => {
                         const [lat, lon] = pair.split(',').map(Number);
                         return [lat, lon];
@@ -90,9 +89,11 @@ function initMap() {
                     
                     if(coordinates.length > 0) {
                         countries[countryCode] = coordinates;
+                        countryNames[countryCode] = countryName;  // Store the country name
                     }
                 }
             });
+
 
             // Create polygons for each country
             Object.entries(countries).forEach(([countryCode, coordinates]) => {
@@ -177,12 +178,12 @@ function selectDate(date, element, data) {
     const infoPanel = document.getElementById('info-panel');
     if (countries.length === 1) {
         const countryEvents = events[countries[0]];
-        // Combine all themes with line breaks for single country
+        const countryNameText = countryNames[countries[0]] || countries[0];
         const combinedText = Object.entries(countryEvents)
             .map(([theme, text]) => `${theme}:\n${text}`)
             .join('\n\n');
             
-        infoPanel.textContent = combinedText;
+        infoPanel.innerHTML = `<strong>${countryNameText}</strong>\n\n${combinedText}`;
         infoPanel.style.position = 'absolute';
         infoPanel.style.top = '20px';
         infoPanel.style.right = '20px';
@@ -192,6 +193,7 @@ function selectDate(date, element, data) {
         infoPanel.style.display = 'none';
     }
 }
+
 
 
 function showCountryInfo(country) {
@@ -206,11 +208,12 @@ function showCountryInfo(country) {
 
                     if (filteredEvents.length > 0) {
                         const infoPanel = document.getElementById('info-panel');
-                        const combinedText = filteredEvents
+                        const countryNameText = countryNames[country] || country;
+                        const eventsText = filteredEvents
                             .map(([theme, text]) => `${theme}:\n${text}`)
                             .join('\n\n');
                         
-                        infoPanel.textContent = combinedText;
+                        infoPanel.innerHTML = `<strong>${countryNameText}</strong>\n\n${eventsText}`;
                         
                         document.onmousemove = function(e) {
                             infoPanel.style.left = `${e.clientX}px`;
@@ -224,6 +227,7 @@ function showCountryInfo(country) {
             });
     }
 }
+
 
 
 document.addEventListener('DOMContentLoaded', () => {
