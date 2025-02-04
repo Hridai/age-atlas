@@ -1,97 +1,6 @@
-historical_data = {
-    "4.5 billion BC": {
-        "World": {
-            "Geography & Environment": "Earth formed"
-        }
-    },
+import pandas as pd
 
-    "2.5 million BC": {
-        "World": {
-            "Science, Technology & Innovation": "Evolution of genus Homo in Africa. First stone tools."
-        }
-    },
-
-    "500,000 BC": {
-        "World": {
-            "Science, Technology & Innovation": "Neanderthals evolve in Europe and Middle East"
-        }
-    },
-
-    "200,000 BC": {
-        "World": {
-            "Science, Technology & Innovation": "Homo sapiens evolve in East Africa"
-        }
-    },
-
-    "70,000 BC - 10,000 BC": {
-        "World": {
-            "Science, Technology & Innovation": "Beginning of history, sapiens move out of Africa. Start of what is said to be the 'Cognitive Revolution'"
-        },
-        "AUS": {
-            "Geography & Environment": "45,000 BC: Sapiens settle Australia. Extinction of Megafauna"
-        },
-        "Mesopotamia": {
-            "Science, Technology & Innovation": "70,000 BC: Sapiens settle Mesopotamia, modern day Iraq, between the Euphrates and Tigris rivers. Boats, bows, arrows and needles for sewing clothing invented until 30,000 BC"
-        },
-        "CHN": {
-            "Geography & Environment": "60,000 BC: Sapiens settle East and Central Asia"
-        },
-        "FRA": {
-            "Geography & Environment": "45,000 BC: Sapiens settle Europe"
-        },
-        "USA": {
-            "Geography & Environment": "16,000 BC: Sapiens settle North America via landbridge between Russia and Alaska, available due to low sea levels. Exctinction of American megafauna"
-        },
-        "MEX": {
-            "Geography & Environment": "14,000BC: Sapiens migrate further south due to global warming melting ice and clearing a passage into Central America, reaching Argentina by 10,000 BC"
-        }
-    },
-
-    "10,000 BC - 2,000 BC": {
-        "World": {
-            "Science, Technology & Innovation": "Start of the 'Agricultural Revolution'. Sapiens settle down and start farming. Domestication of plants and animals. Also known as the 'Neolithic Revolution', and lasts until ~2,000 BC"
-        },
-        "AUS": {
-            "Culture & Religion": "3,000 BC Australia: Indigenous Australians developed complex societies with trade networks, agriculture, and spiritual beliefs, with the oldest known rock art in the world dating to 28,000 BC"
-        },
-        "IRQ": {
-            "Governance & Society": "2,250 BC Iraq: The Akkadian Empire emerged, with the first known empire in history created by Sargon the Great, and the first known written laws, the Code of Ur-Nammu, in 2,100 BC"
-        },
-        "Mesopotamia": {
-            "Science, Technology & Innovation": "9,500 BC Southeastern Turkey, western Iran, and the Levant: Humans started cultivating wild cereals, gradually shifting from foraging to farming and constructed stone houses, stored grain, developed tools like scythes, pestles, and mortars"
-        },
-        "SAU": {
-            "Science, Technology & Innovation": "9,000 BC Middle East: Wheat became a staple crop, while goats were selectively bred for meat & milk and added peas & lentils in 8,000 BC"
-        },
-        "TUR": {
-            "Science, Technology & Innovation": "7000 BC: Çatalhöyük in Anatolia grew to between 5,000–10,000 residents, becoming one of the earliest towns. 5,000 BC Mediterranean: Olive trees domesticated providing a reliable source of oil for cooking, lighting, and trade, becomes cornerstone of economy. Göbekli Tepe in southeastern Turkey was built by hunter-gatherers, featuring monumental structures with intricate carvings in 9500 BC."
-        },
-        "Eurasia": {
-            "Science, Technology & Innovation": "4,000 BC Eurasia: Horses domesticated - transportation, trade, and warfare revolutionised"
-        },
-        "MEX": {
-            "Science, Technology & Innovation": "4,500 BC Central America: Maize and beans were domesticated, forming the foundation of Mesoamerican civilizations like the Maya and Aztecs"
-        },
-        "PNG": {
-            "Science, Technology & Innovation": "6,000 BC Papua New Guinea: Sugarcane and bananas were domesticated"
-        },
-        "WestAfrica": {
-            "Science, Technology & Innovation": "3,000 BC West Africa: millet, rice, and sorghum domesticated, supporting the development of early farming communities in the Sahel"
-        },
-        "IND": {
-            "Science, Technology & Innovation": "3,000 BC India: Evidence emerged of Harappan civilisation in the Indus Valley, with advanced urban planning, writing, and trade networks. Rice, wheat, and barley were domesticated in the region"
-        },
-        "EGY": {
-            "Governance & Society": "3,000 BC Egypt: The unification of the Nile Valley into the first Egyptian kingdom under the pharaohs began, with the construction of the first pyramids in 2,600 BC"
-        },
-        "GRE": {
-            "Science, Technology & Innovation": "3,000 BC Greece: The Minoan civilization in Crete developed writing, monumental architecture, and trade networks, with the first Greek civilization emerging in 2,000 BC"
-        },
-        "Mesoamerica": {
-            "Science, Technology & Innovation": "4,000 BC Mesoamerica: Potatoes and llamas were domesticated, supporting high-altitude societies in the Andes with hardy crops and pack animals. Rice, millet, and pigs were domesticated in Modern day Chile"
-        },
-    },
-
+historical_data = {  # for illustrative purposes now
     "2,000 BC - 0": {
         "World": {
             "Geography & Environment": "The agricultural revolution allowed the human population grow from 5-8 million foragers globally, to 250 million farmers by 1st century AD. Settled societies, cities, and states emerged, with the first empires in Mesopotamia, Egypt, India, and China. Writing, money, and religion developed, and the first major religions emerged."
@@ -103,33 +12,25 @@ historical_data = {
         "EGY": {
             "Science, Technology & Innovation": "2,000 BC: Egyptians developed hieroglyphics, the first writing system in Africa. The Great Pyramid of Giza was built in 2,560 BC."
         },
-        "IND": {
-            "Science, Technology & Innovation": "1,500 BC: Indus Valley Civilization in modern day Pakistan and India developed a writing system, urban planning, and advanced drainage systems."
-        },
-        "CHN": {
-            "Science, Technology & Innovation": "1,600 BC China: The second Chinese dynasty, the Shang Dynasty, emerged, with the first known Chinese writing system, oracle bones, and bronze metallurgy. 221 BC: The Qin dynasty united China and established a massive centralized state.",
-            "Governance & Society": "1,600 BC China: The second Chinese dynasty, the Shang Dynasty, emerged, with the first known Chinese writing system, oracle bones, and bronze metallurgy. 221 BC: The Qin dynasty united China and established a massive centralized state."
-        },
-        "GRE": {
-            "Governance & Society": "1,200 BC Greece: The Mycenaean civilization in Greece developed writing, trade, and monumental architecture, with the Trojan War in 1,200 BC."
-        },
-        "ITA": {
-            "Governance & Society": "753 BC Rome: The city of Rome was founded, with the Roman Republic emerging in 509 BC."
-        },
-        "Mesoamerica": {
-            "Science, Technology & Innovation": "1,000 BC: The Olmec civilization in Mesoamerica developed monumental architecture, writing, and trade networks."
-        },
-        "USA": {
-            "Science, Technology & Innovation": "1,000 BC: The Adena culture in North America developed monumental architecture, trade networks, and agriculture."
-        },
-        "WestAfrica": {
-            "Science, Technology & Innovation": "1,000 BC: The Nok civilization in West Africa developed iron metallurgy, monumental sculpture, and trade networks."
-        },
-        "PNG": {
-            "Science, Technology & Innovation": "1,000 BC: The Lapita culture in Papua New Guinea developed pottery, agriculture, and trade networks."
-        },
-        "AUS": {
-            "Economy & Trade": "1,000 BC: The Yolngu people in Australia developed trade networks with Indonesia, agriculture, and rock art."
-        },
     },
 }
+
+def dict_to_csv(historical_data):
+    rows = []
+    
+    for date, date_data in historical_data.items():
+        for country, country_data in date_data.items():
+            if isinstance(country_data, dict):  # Skip the 'order' key
+                for theme, event in country_data.items():
+                    rows.append({
+                        'Date': date,
+                        'Country': country,
+                        'Theme': theme,
+                        'Event': event
+                    })
+    
+    df = pd.DataFrame(rows)
+    df.to_csv('data/historical_events.csv', index=False)
+    return df
+
+dict_to_csv(historical_data)
