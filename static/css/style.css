@@ -55,7 +55,7 @@ body {
 }
 
 #info-panel {
-    position: fixed;  /* Changed from absolute */
+    position: fixed;
     background: white;
     border: 1px solid #ddd;
     padding: 15px;
@@ -66,7 +66,8 @@ body {
     z-index: 1000;
     transform: translate(0, 0);
     margin: 0;
- }
+    white-space: pre-line;
+}
 
 .country-polygon {
     fill-opacity: 0.4;

@@ -90,7 +90,7 @@ function selectDate(date, element, data) {
     
     element.classList.add('selected');
     selectedDate = date;
- 
+
     // Show only countries with events
     const events = data[date];
     const countries = Object.keys(events).filter(key => key !== 'order');
@@ -105,10 +105,16 @@ function selectDate(date, element, data) {
             });
         }
     });
- 
+
     const infoPanel = document.getElementById('info-panel');
     if (countries.length === 1) {
-        infoPanel.textContent = events[countries[0]];
+        const countryEvents = events[countries[0]];
+        // Combine all themes with line breaks for single country
+        const combinedText = Object.entries(countryEvents)
+            .map(([theme, text]) => `${theme}:\n${text}`)
+            .join('\n\n');
+            
+        infoPanel.textContent = combinedText;
         infoPanel.style.position = 'absolute';
         infoPanel.style.top = '20px';
         infoPanel.style.right = '20px';
@@ -117,7 +123,7 @@ function selectDate(date, element, data) {
     } else {
         infoPanel.style.display = 'none';
     }
- }
+}
 
  function showCountryInfo(country) {
     if (selectedDate) {
@@ -126,7 +132,14 @@ function selectDate(date, element, data) {
             .then(data => {
                 if (data[selectedDate][country]) {
                     const infoPanel = document.getElementById('info-panel');
-                    infoPanel.textContent = data[selectedDate][country];
+                    const countryEvents = data[selectedDate][country];
+                    
+                    // Combine all themes with line breaks
+                    const combinedText = Object.entries(countryEvents)
+                        .map(([theme, text]) => `${theme}:\n${text}`)
+                        .join('\n\n');
+                    
+                    infoPanel.textContent = combinedText;
                     
                     document.onmousemove = function(e) {
                         infoPanel.style.left = `${e.clientX}px`;
@@ -138,7 +151,8 @@ function selectDate(date, element, data) {
                 }
             });
     }
- }
+}
+
 
 document.addEventListener('DOMContentLoaded', () => {
    initMap();
