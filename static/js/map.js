@@ -59,9 +59,6 @@ function initSettings() {
 
     settingsButton.onclick = () => {
         modal.style.display = "block";
-        if (isMobile && isTimelineVisible) {
-            toggleTimeline();
-        }
     };
     
     closeButton.onclick = () => modal.style.display = "none";
@@ -274,7 +271,11 @@ function showCountryInfo(country) {
                             .map(([theme, text]) => `${theme}:\n${text}`)
                             .join('\n\n');
                         
-                        infoPanel.innerHTML = `<strong>${countryNameText}</strong>\n\n${eventsText}`;
+                        // Add a close button for mobile
+                        const closeButtonHtml = isMobile ? 
+                            '<button onclick="document.getElementById(\'info-panel\').style.display=\'none\'" style="width: 100%; padding: 10px; margin-top: 20px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">Close</button>' : '';
+                        
+                        infoPanel.innerHTML = `<strong>${countryNameText}</strong>\n\n${eventsText}\n${closeButtonHtml}`;
                         
                         if (isMobile) {
                             infoPanel.style.position = 'fixed';
