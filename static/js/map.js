@@ -1,9 +1,11 @@
 // static/js/map.js
 let map;
 let countryLayers = {};
-let countryNames = {};  // Add this at the top with your other global variables
+let countryNames = {};
 let selectedDate = null;
 let selectedTopics = new Set();
+let isMobile = window.innerWidth <= 768;
+let isTimelineVisible = !isMobile;
 
 function initSettings() {
     const settingsButton = document.getElementById('settings-button');
@@ -11,7 +13,6 @@ function initSettings() {
     const closeButton = document.getElementById('close-modal');
     const topicCheckboxes = document.getElementById('topic-checkboxes');
 
-    // Get unique topics from historical data
     fetch('/api/events')
         .then(response => response.json())
         .then(data => {
@@ -24,7 +25,6 @@ function initSettings() {
                 });
             });
 
-            // Create checkboxes for each topic
             topics.forEach(topic => {
                 const div = document.createElement('div');
                 div.className = 'topic-checkbox';
@@ -32,8 +32,8 @@ function initSettings() {
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
                 checkbox.id = topic;
-                checkbox.checked = true; // Default all to checked
-                selectedTopics.add(topic); // Add to selected topics
+                checkbox.checked = true;
+                selectedTopics.add(topic);
                 
                 const label = document.createElement('label');
                 label.htmlFor = topic;
@@ -57,13 +57,58 @@ function initSettings() {
             });
         });
 
-    settingsButton.onclick = () => modal.style.display = "block";
+    settingsButton.onclick = () => {
+        modal.style.display = "block";
+        if (isMobile && isTimelineVisible) {
+            toggleTimeline();
+        }
+    };
+    
     closeButton.onclick = () => modal.style.display = "none";
     window.onclick = (event) => {
         if (event.target == modal) {
             modal.style.display = "none";
         }
+    };
+}
+
+function toggleTimeline() {
+    const timeline = document.getElementById('timeline');
+    isTimelineVisible = !isTimelineVisible;
+    timeline.classList.toggle('collapsed', !isTimelineVisible);
+}
+
+function initMobileSupport() {
+    const mobileToggle = document.getElementById('mobile-toggle');
+    const closeInfoButton = document.getElementById('close-info-button');
+    const closeTimelineButton = document.getElementById('close-timeline-button');
+    const infoPanel = document.getElementById('info-panel');
+
+    if (mobileToggle) {
+        mobileToggle.addEventListener('click', toggleTimeline);
     }
+
+    if (closeInfoButton) {
+        closeInfoButton.addEventListener('click', () => {
+            infoPanel.style.display = 'none';
+        });
+    }
+
+    if (closeTimelineButton) {
+        closeTimelineButton.addEventListener('click', () => {
+            toggleTimeline();
+        });
+    }
+
+    window.addEventListener('resize', () => {
+        const newIsMobile = window.innerWidth <= 768;
+        if (newIsMobile !== isMobile) {
+            isMobile = newIsMobile;
+            isTimelineVisible = !isMobile;
+            const timeline = document.getElementById('timeline');
+            timeline.classList.toggle('collapsed', !isTimelineVisible);
+        }
+    });
 }
 
 function initMap() {
@@ -89,13 +134,11 @@ function initMap() {
                     
                     if(coordinates.length > 0) {
                         countries[countryCode] = coordinates;
-                        countryNames[countryCode] = countryName;  // Store the country name
+                        countryNames[countryCode] = countryName;
                     }
                 }
             });
 
-
-            // Create polygons for each country
             Object.entries(countries).forEach(([countryCode, coordinates]) => {
                 const polygon = L.polygon(coordinates, {
                     color: 'transparent',
@@ -106,18 +149,23 @@ function initMap() {
                     className: 'country-polygon'
                 }).addTo(map);
 
-                polygon.on({
-                    mouseover: () => showCountryInfo(countryCode),
-                    mouseout: () => {
-                        document.getElementById('info-panel').style.display = 'none';
-                    }
-                });
+                if (isMobile) {
+                    polygon.on('click', () => showCountryInfo(countryCode));
+                } else {
+                    polygon.on({
+                        mouseover: () => showCountryInfo(countryCode),
+                        mouseout: () => {
+                            if (!isMobile) {
+                                document.getElementById('info-panel').style.display = 'none';
+                            }
+                        }
+                    });
+                }
                 countryLayers[countryCode] = polygon;
             });
         })
         .catch(error => console.error('Error loading country coordinates:', error));
 }
-
 
 function createTimeline() {
     const timeline = document.getElementById('timeline');
@@ -130,7 +178,12 @@ function createTimeline() {
                     const dateDiv = document.createElement('div');
                     dateDiv.className = 'timeline-date';
                     dateDiv.textContent = date;
-                    dateDiv.onclick = () => selectDate(date, dateDiv, data);
+                    dateDiv.onclick = () => {
+                        selectDate(date, dateDiv, data);
+                        if (isMobile) {
+                            toggleTimeline();
+                        }
+                    };
                     timeline.appendChild(dateDiv);
                 });
         });
@@ -141,7 +194,6 @@ function selectDate(date, element, data) {
         el.classList.remove('selected');
     });
     
-    // First hide all countries completely
     Object.values(countryLayers).forEach(layer => {
         layer.setStyle({
             opacity: 0,
@@ -154,13 +206,11 @@ function selectDate(date, element, data) {
     element.classList.add('selected');
     selectedDate = date;
 
-    // Show only countries with events
     const events = data[date];
     const countries = Object.keys(events).filter(key => key !== 'order');
     
     Object.entries(events).forEach(([country, countryEvents]) => {
         if (countryLayers[country] && country !== 'order') {
-            // Check if country has any events in selected topics
             const hasSelectedTopics = Object.keys(countryEvents)
                 .some(topic => selectedTopics.has(topic));
             
@@ -179,22 +229,33 @@ function selectDate(date, element, data) {
     if (countries.length === 1) {
         const countryEvents = events[countries[0]];
         const countryNameText = countryNames[countries[0]] || countries[0];
-        const combinedText = Object.entries(countryEvents)
-            .map(([theme, text]) => `${theme}:\n${text}`)
-            .join('\n\n');
+        const filteredEvents = Object.entries(countryEvents)
+            .filter(([theme]) => selectedTopics.has(theme));
             
-        infoPanel.innerHTML = `<strong>${countryNameText}</strong>\n\n${combinedText}`;
-        infoPanel.style.position = 'absolute';
-        infoPanel.style.top = '20px';
-        infoPanel.style.right = '20px';
-        infoPanel.style.display = 'block';
-        document.onmousemove = null;
+        if (filteredEvents.length > 0) {
+            const eventsText = filteredEvents
+                .map(([theme, text]) => `${theme}:\n${text}`)
+                .join('\n\n');
+                
+            infoPanel.innerHTML = `<strong>${countryNameText}</strong>\n\n${eventsText}`;
+            infoPanel.style.display = 'block';
+            
+            if (isMobile) {
+                infoPanel.style.position = 'fixed';
+                infoPanel.style.top = '50%';
+                infoPanel.style.left = '50%';
+                infoPanel.style.transform = 'translate(-50%, -50%)';
+            } else {
+                infoPanel.style.position = 'absolute';
+                infoPanel.style.top = '20px';
+                infoPanel.style.right = '20px';
+                infoPanel.style.transform = 'none';
+            }
+        }
     } else {
         infoPanel.style.display = 'none';
     }
 }
-
-
 
 function showCountryInfo(country) {
     if (selectedDate) {
@@ -215,11 +276,20 @@ function showCountryInfo(country) {
                         
                         infoPanel.innerHTML = `<strong>${countryNameText}</strong>\n\n${eventsText}`;
                         
-                        document.onmousemove = function(e) {
-                            infoPanel.style.left = `${e.clientX}px`;
-                            infoPanel.style.top = `${e.clientY}px`;
+                        if (isMobile) {
                             infoPanel.style.position = 'fixed';
-                        };
+                            infoPanel.style.top = '50%';
+                            infoPanel.style.left = '50%';
+                            infoPanel.style.transform = 'translate(-50%, -50%)';
+                            document.onmousemove = null;
+                        } else {
+                            document.onmousemove = function(e) {
+                                infoPanel.style.position = 'fixed';
+                                infoPanel.style.left = `${e.clientX}px`;
+                                infoPanel.style.top = `${e.clientY}px`;
+                                infoPanel.style.transform = 'none';
+                            };
+                        }
                         
                         infoPanel.style.display = 'block';
                     }
@@ -235,7 +305,6 @@ function initSubmitFact() {
     const cancelButton = document.getElementById('cancel-submission');
     const toast = document.getElementById('toast');
 
-    // Populate theme dropdown from historical data
     fetch('/api/events')
         .then(response => response.json())
         .then(data => {
@@ -262,25 +331,25 @@ function initSubmitFact() {
             });
         });
 
-    submitButton.onclick = () => modal.style.display = "block";
+    submitButton.onclick = () => {
+        modal.style.display = "block";
+        if (isMobile && isTimelineVisible) {
+            toggleTimeline();
+        }
+    };
+    
     cancelButton.onclick = () => modal.style.display = "none";
 
-    // Simplified form submission just showing toast
     form.onsubmit = (e) => {
         e.preventDefault();
-        
-        // Show toast
         toast.style.display = 'flex';
         setTimeout(() => {
             toast.style.display = 'none';
         }, 3000);
-
-        // Close modal and reset form
         modal.style.display = 'none';
         form.reset();
     };
 
-    // Close modal on outside click
     window.onclick = (event) => {
         if (event.target == modal) {
             modal.style.display = "none";
@@ -288,10 +357,23 @@ function initSubmitFact() {
     };
 }
 
+// Close info panel when clicking outside on mobile
+if (isMobile) {
+    document.addEventListener('click', (event) => {
+        const infoPanel = document.getElementById('info-panel');
+        const isClickInsideInfoPanel = infoPanel.contains(event.target);
+        const isClickOnCountry = event.target.classList.contains('country-polygon');
+        
+        if (!isClickInsideInfoPanel && !isClickOnCountry && infoPanel.style.display === 'block') {
+            infoPanel.style.display = 'none';
+        }
+    });
+}
 
 document.addEventListener('DOMContentLoaded', () => {
    initMap();
    createTimeline();
    initSettings();
    initSubmitFact();
+   initMobileSupport();
 });
