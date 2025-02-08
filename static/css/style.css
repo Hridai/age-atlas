@@ -147,11 +147,13 @@ body {
 
 .button-container {
     display: flex;
-    flex-direction: row;  /* Ensure horizontal layout */
-    gap: 10px;
-    padding: 10px;
-    align-items: center;  /* Center buttons vertically */
+    flex-direction: row;  /* Forces horizontal layout */
+    justify-content: flex-start; /* Aligns buttons to the start */
+    align-items: center; /* Centers buttons vertically */
+    gap: 10px; /* Space between buttons */
+    margin: 10px; /* Margin around container */
 }
+
 
 .form-group {
     margin-bottom: 15px;
