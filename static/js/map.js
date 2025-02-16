@@ -305,7 +305,7 @@ function initSubmitFact() {
     const form = document.getElementById('fact-submission-form');
     const cancelButton = document.getElementById('cancel-submission');
     const toast = document.getElementById('toast');
-
+ 
     fetch('/api/events')
         .then(response => response.json())
         .then(data => {
@@ -331,7 +331,7 @@ function initSubmitFact() {
                 themeSelect.appendChild(option);
             });
         });
-
+ 
     submitButton.onclick = () => {
         modal.style.display = "block";
         if (isMobile && isTimelineVisible) {
@@ -340,23 +340,53 @@ function initSubmitFact() {
     };
     
     cancelButton.onclick = () => modal.style.display = "none";
-
-    form.onsubmit = (e) => {
+ 
+    form.onsubmit = async (e) => {
         e.preventDefault();
-        toast.style.display = 'flex';
-        setTimeout(() => {
-            toast.style.display = 'none';
-        }, 3000);
-        modal.style.display = 'none';
-        form.reset();
+        const formData = {
+            country: document.getElementById('country').value,
+            timePeriod: document.getElementById('time-period').value,
+            theme: document.getElementById('theme').value,
+            source: document.getElementById('source').value,
+            email: document.getElementById('email').value,
+            fact: document.getElementById('fact').value
+        };
+    
+        try {
+            const response = await fetch('/api/submit-fact', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+    
+            const data = await response.json();
+            
+            if (response.ok) {
+                toast.style.display = 'flex';
+                setTimeout(() => {
+                    toast.style.display = 'none';
+                }, 3000);
+                modal.style.display = 'none';
+                form.reset();
+            } else {
+                console.error('Server error:', data.error);
+                alert(`Failed to submit fact: ${data.error}`);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert(`Failed to submit fact: ${error.message}`);
+        }
     };
-
+    
+ 
     window.onclick = (event) => {
         if (event.target == modal) {
             modal.style.display = "none";
         }
     };
-}
+ }
 
 // Close info panel when clicking outside on mobile
 if (isMobile) {
